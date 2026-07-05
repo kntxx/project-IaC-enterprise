@@ -1,4 +1,4 @@
-name: "2. Terraform CD (Main Deployment)"
+name: "CD"
 
 
 on:
