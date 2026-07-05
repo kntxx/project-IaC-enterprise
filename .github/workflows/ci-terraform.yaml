@@ -1,0 +1,39 @@
+name: 'CI'
+
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  ARM_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).appId }}
+  ARM_CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).password }}
+  ARM_TENANT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).tenant }}
+  ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
+
+jobs:
+  validate_and_plan:
+    name: 'Lint, Validate & Plan'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform init
+
+    
+    - name: Terraform Format Check
+      run: terraform fmt -check
+
+    
+    - name: Terraform Validate
+      run: terraform validate
+
+
+    - name: Terraform Plan (Dry Run)
+      run: terraform plan -var-file="env/dev.tfvars"

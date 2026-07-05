@@ -1,0 +1,49 @@
+name: "2. Terraform CD (Main Deployment)"
+
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  ARM_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).appId }}
+  ARM_CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).password }}
+  ARM_TENANT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).tenant }}
+  ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
+
+jobs:
+  
+  deploy_dev:
+    name: "Deploy to Development"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+      - run: terraform init
+      - run: terraform plan -var-file="env/dev.tfvars" -out=devplan
+      - run: terraform apply -auto-approve devplan
+
+  
+  deploy_staging:
+    name: "Deploy to Staging"
+    needs: deploy_dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+      - run: terraform init
+      - run: terraform plan -var-file="env/staging.tfvars" -out=stagingplan
+      - run: terraform apply -auto-approve stagingplan
+
+  
+  deploy_production:
+    name: "Deploy to Production"
+    needs: deploy_staging
+    runs-on: ubuntu-latest
+    environment: Production 
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+      - run: terraform init
+      - run: terraform plan -var-file="env/prod.tfvars" -out=prodplan
+      - run: terraform apply -auto-approve prodplan
