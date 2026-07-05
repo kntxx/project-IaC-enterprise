@@ -1,4 +1,4 @@
-rg_name = "rg-${environment}-enterpriseProj"
+rg_name = "rg-prod-enterpriseProj"
 location    = "eastasia"
 environment = "prod"
 
