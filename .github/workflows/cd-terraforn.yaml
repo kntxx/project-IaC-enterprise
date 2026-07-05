@@ -1,6 +1,5 @@
 name: "CD"
 
-
 on:
   push:
     branches: ["main"]
@@ -12,7 +11,6 @@ env:
   ARM_SUBSCRIPTION_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).subscriptionId }}
 
 jobs:
-  
   deploy_dev:
     name: "Deploy to Development"
     runs-on: ubuntu-latest
@@ -23,7 +21,6 @@ jobs:
       - run: terraform plan -var-file="env/dev.tfvars" -out=devplan
       - run: terraform apply -auto-approve devplan
 
-  
   deploy_staging:
     name: "Deploy to Staging"
     needs: deploy_dev
@@ -35,12 +32,11 @@ jobs:
       - run: terraform plan -var-file="env/staging.tfvars" -out=stagingplan
       - run: terraform apply -auto-approve stagingplan
 
-  
   deploy_production:
     name: "Deploy to Production"
     needs: deploy_staging
     runs-on: ubuntu-latest
-    environment: Production 
+    environment: Production
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v2
