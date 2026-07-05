@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v2
-      - run: terraform init
+      - run: terraform init -backend-config="key=dev.terraform.tfstate"
       - run: terraform plan -var-file="env/dev.tfvars" -out=devplan
       - run: terraform apply -auto-approve devplan
 
@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v2
-      - run: terraform init
+      - run: terraform init -backend-config="key=staging.terraform.tfstate"
       - run: terraform plan -var-file="env/staging.tfvars" -out=stagingplan
       - run: terraform apply -auto-approve stagingplan
 
@@ -44,6 +44,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v2
-      - run: terraform init
+      - run: terraform init -backend-config="key=prod.terraform.tfstate"
       - run: terraform plan -var-file="env/prod.tfvars" -out=prodplan
       - run: terraform apply -auto-approve prodplan

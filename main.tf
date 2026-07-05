@@ -7,10 +7,9 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name  = "rg-devops-shared"
+    resource_group_name  = "rg-devOps-shared"
     storage_account_name = "staccounttffstates01"
     container_name       = "tfstate"
-    key                  = "dev.terraform.tfstate"
   }
 }
 
@@ -29,8 +28,8 @@ resource "azurerm_resource_group" "rg" {
 module "network" {
   source = "./modules/network"
 
-  resource_group_name = var.rg_name
-  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
 
   vnet-Name = "vnet-${var.environment}-${var.location}-01"
 
@@ -46,8 +45,8 @@ module "network" {
 module "bastion" {
   source = "./modules/bastion"
 
-  location            = var.location
-  resource_group_name = var.rg_name
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
 
   bastion-host-name = "bas-${var.environment}-${var.location}-01"
   subnet-bastion-id = module.network.bastion_subnet_id
@@ -59,9 +58,8 @@ module "bastion" {
 module "compute" {
   source = "./modules/compute"
 
-  resource_group_name = var.rg_name
-
-  location = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
 
   vm_name           = "vm-${var.environment}-${var.location}-01"
   admin_username    = "linuxadmin"
@@ -73,8 +71,8 @@ module "compute" {
 module "observability" {
   source = "./modules/observability"
 
-  resource_group_name = var.rg_name
-  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
   environment         = var.environment
   workspace_name      = "law-${var.environment}-${var.location}-01"
   vm_id               = module.compute.vm_id
