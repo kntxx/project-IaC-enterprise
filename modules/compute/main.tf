@@ -35,6 +35,10 @@ resource "azurerm_linux_virtual_machine" "this" {
     
     disable_password_authentication = false
 
+    custom_data = base64encode(templatefile("${path.root}/modules/scripts/webserver.sh", {
+    environment = var.environment
+  }))
+
     os_disk {
       caching = "ReadWrite"
       storage_account_type = "Standard_LRS"

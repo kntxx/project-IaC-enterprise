@@ -1,7 +1,7 @@
 name: 'Destroy Infrastructure'
 
 on:
-  workflow_dispatch: # This creates the manual "Run workflow" button in GitHub
+  workflow_dispatch: 
 
 env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}

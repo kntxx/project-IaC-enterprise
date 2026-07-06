@@ -39,6 +39,9 @@ module "network" {
 
   subnet-private-name = "snet-${var.environment}-private-01"
   nsg_name            = "nsg-${var.environment}-private-01"
+
+  natName = "nat-${var.environment}-${var.location}-01"
+  pipName =   "pip-nat-${var.environment}-${var.location}-01"
 }
 
 
@@ -50,7 +53,7 @@ module "bastion" {
 
   bastion-host-name = "bas-${var.environment}-${var.location}-01"
   subnet-bastion-id = module.network.bastion_subnet_id
-  publicIp-name     = "pip-${var.environment}-${var.location}-01"
+  publicIp-name     = "pip-bastion-${var.environment}-${var.location}-01"
   bastion-sku       = var.bastion-sku
 
 }
@@ -65,6 +68,7 @@ module "compute" {
   admin_username    = "linuxadmin"
   vm_size           = var.vm-sku
   private_subnet_id = module.network.private_subnet_id
+  environment       = var.environment
 }
 
 
