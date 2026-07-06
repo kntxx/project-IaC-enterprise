@@ -41,7 +41,7 @@ module "network" {
   nsg_name            = "nsg-${var.environment}-private-01"
 
   natName = "nat-${var.environment}-${var.location}-01"
-  pipName =   "pip-nat-${var.environment}-${var.location}-01"
+  pipName = "pip-nat-${var.environment}-${var.location}-01"
 }
 
 
