@@ -31,3 +31,12 @@ variable "nsg_name" {
   type = string
   default = "nsg"
 }
+
+variable "pipName" {
+  type = string
+}
+
+variable "natName" {
+  type = string
+  default = "nat"
+}
