@@ -22,8 +22,6 @@ jobs:
       - run: terraform apply -auto-approve devplan
   # ---------------------------------------------------------
   # COMMENTED OUT AZURE STUDENT QUOTA LIMITS
-  # In a real enterprise environment with higher IP limits, 
-  # these tiers would execute sequentially.
   # ---------------------------------------------------------
   # deploy_staging:
   #   name: "Deploy to Staging"
