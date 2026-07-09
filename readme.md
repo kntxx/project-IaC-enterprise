@@ -147,10 +147,7 @@ terraform/
 │   ├── staging.tfvars
 │   └── prod.tfvars
 │
-├── backend.tf
-├── providers.tf
 ├── variables.tf
-├── outputs.tf
 └── main.tf
 
 .github/
