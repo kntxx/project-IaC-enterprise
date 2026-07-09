@@ -20,26 +20,30 @@ jobs:
       - run: terraform init -backend-config="key=dev.terraform.tfstate"
       - run: terraform plan -var-file="env/dev.tfvars" -out=devplan
       - run: terraform apply -auto-approve devplan
+  # ---------------------------------------------------------
+  # COMMENTED OUT AZURE STUDENT QUOTA LIMITS
+  # In a real enterprise environment with higher IP limits, 
+  # these tiers would execute sequentially.
+  # ---------------------------------------------------------
+  # deploy_staging:
+  #   name: "Deploy to Staging"
+  #   needs: deploy_dev
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: hashicorp/setup-terraform@v2
+  #     - run: terraform init -backend-config="key=staging.terraform.tfstate"
+  #     - run: terraform plan -var-file="env/staging.tfvars" -out=stagingplan
+  #     - run: terraform apply -auto-approve stagingplan
 
-  deploy_staging:
-    name: "Deploy to Staging"
-    needs: deploy_dev
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: hashicorp/setup-terraform@v2
-      - run: terraform init -backend-config="key=staging.terraform.tfstate"
-      - run: terraform plan -var-file="env/staging.tfvars" -out=stagingplan
-      - run: terraform apply -auto-approve stagingplan
-
-  deploy_production:
-    name: "Deploy to Production"
-    needs: deploy_staging
-    runs-on: ubuntu-latest
-    environment: Production
-    steps:
-      - uses: actions/checkout@v3
-      - uses: hashicorp/setup-terraform@v2
-      - run: terraform init -backend-config="key=prod.terraform.tfstate"
-      - run: terraform plan -var-file="env/prod.tfvars" -out=prodplan
-      - run: terraform apply -auto-approve prodplan
+  # deploy_production:
+  #   name: "Deploy to Production"
+  #   needs: deploy_staging
+  #   runs-on: ubuntu-latest
+  #   environment: Production
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: hashicorp/setup-terraform@v2
+  #     - run: terraform init -backend-config="key=prod.terraform.tfstate"
+  #     - run: terraform plan -var-file="env/prod.tfvars" -out=prodplan
+  #     - run: terraform apply -auto-approve prodplan

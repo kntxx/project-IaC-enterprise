@@ -83,11 +83,11 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "alert_heartbeat" {
   description    = "Triggers when the Linux VM stops reporting health heartbeats for over 5 minutes."
   enabled        = true
   
-  # Check every 5 minutes looking back over the last 5 minutes
+
   frequency   = 5
   time_window = 5
 
-  # KQL: If count is 0, the agent has stopped talking to Azure Monitor
+
   query       = <<-QUERY
     Heartbeat
     | summarize LastHeartbeat = max(TimeGenerated) by Computer
@@ -128,7 +128,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "alert_cpu_spike" {
   }
 }
 
-# 3. Alert 2: Failed SSH Attempts (Security Brute Force)
+
 resource "azurerm_monitor_scheduled_query_rules_alert" "alert_ssh_failures" {
   name                = "alert-${var.environment}-ssh-brute-force"
   location            = var.location
@@ -144,7 +144,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "alert_ssh_failures" {
   frequency      = 5
   time_window    = 5
 
-  # KQL: Scans syslog facility for authentication drops or password rejections
+
   query       = <<-QUERY
     Syslog
     | where Facility in ("auth", "authpriv")
