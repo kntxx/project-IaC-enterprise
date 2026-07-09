@@ -12,8 +12,6 @@ env:
 jobs:
   # ---------------------------------------------------------
   # COMMENTED OUT AZURE STUDENT QUOTA LIMITS
-  # In a real enterprise environment with higher IP limits,
-  # these tiers would execute sequentially.
   # ---------------------------------------------------------
   # destroy_production:
   #   name: 'Destroy Production'
