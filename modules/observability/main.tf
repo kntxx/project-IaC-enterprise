@@ -42,12 +42,12 @@ resource "azurerm_monitor_data_collection_rule" "dcr" {
       name                          = "vm-perf-counters"
     }
 
-    syslog {
-      streams        = ["Microsoft-Syslog"]
-      facility_names = ["auth", "authpriv"]
-      log_levels     = ["Warning", "Error", "Critical", "Alert", "Emergency"]
-      name           = "vm-security-logs"
-    }
+      syslog {
+        streams        = ["Microsoft-Syslog"]
+        facility_names = ["auth", "authpriv"]
+        log_levels     = ["Info", "Notice", "Warning", "Error", "Critical", "Alert", "Emergency"] 
+        name           = "vm-security-logs"
+      }
   }
 }
 
