@@ -70,90 +70,120 @@ resource "azurerm_monitor_action_group" "alert_notifications" {
   }
 }
 
-resource "azurerm_monitor_scheduled_query_rules_alert" "alert_heartbeat" {
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "alert_heartbeat" {
   name                = "alert-${var.environment}-vm-heartbeat-missing"
   location            = var.location
   resource_group_name = var.resource_group_name
+  scopes              = [azurerm_log_analytics_workspace.law.id]
 
-  action {
-    action_group = [azurerm_monitor_action_group.alert_notifications.id]
+  description          = "Triggers when the Linux VM stops reporting health heartbeats for over 5 minutes."
+  severity             = 1 # 1 = Error (A completely silent VM is usually a critical infrastructure issue)
+  enabled              = true
+  
+  # Frequency and Window mapped to ISO 8601 strings
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT5M"
+
+  criteria {
+   
+    
+    query = <<-QUERY
+      Heartbeat
+    QUERY
+
+    
+    time_aggregation_method = "Count"
+    resource_id_column      = "Computer"
+    
+    
+    operator                = "LessThan"
+    threshold               = 1
+
+    failing_periods {
+      minimum_failing_periods_to_trigger_alert = 1
+      number_of_evaluation_periods       = 1
+    }
   }
 
-  data_source_id = azurerm_log_analytics_workspace.law.id
-  description    = "Triggers when the Linux VM stops reporting health heartbeats for over 5 minutes."
-  enabled        = true
-  
-
-  frequency   = 5
-  time_window = 5
-
-
-  query       = <<-QUERY
-    Heartbeat
-    | summarize LastHeartbeat = max(TimeGenerated) by Computer
-    | where LastHeartbeat < ago(5m)
-  QUERY
-
-  trigger {
-    operator  = "GreaterThanOrEqual"
-    threshold = 1
+  action {
+    action_groups = [azurerm_monitor_action_group.alert_notifications.id]
   }
 }
 
-resource "azurerm_monitor_scheduled_query_rules_alert" "alert_cpu_spike" {
+
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "alert_cpu_spike" {
   name                = "alert-${var.environment}-cpu-spike"
   location            = var.location
   resource_group_name = var.resource_group_name
+  scopes              = [azurerm_log_analytics_workspace.law.id]
 
-  action {
-    action_group = [azurerm_monitor_action_group.alert_notifications.id]
+  description          = "Triggers if average CPU utilization exceeds 85%."
+  
+ 
+  severity             = 2 
+  enabled              = true
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT5M"
+
+  criteria {
+    query = <<-QUERY
+      Perf
+      | where ObjectName == "Processor" and CounterName == "% Processor Time"
+      | summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 5m), Computer
+    QUERY
+
+    time_aggregation_method = "Average"
+    metric_measure_column   = "AggregatedValue"
+    resource_id_column      = "Computer"
+    operator                = "GreaterThan"
+    threshold               = 85
+
+    failing_periods {
+      minimum_failing_periods_to_trigger_alert = 1
+      number_of_evaluation_periods       = 1
+    }
   }
 
-  data_source_id = azurerm_log_analytics_workspace.law.id
-  description    = "Triggers if average CPU utilization exceeds 85%."
-  enabled        = true
-  frequency      = 5
-  time_window    = 5
-
-
-  query       = <<-QUERY
-    Perf
-    | where ObjectName == "Processor" and CounterName == "% Processor Time"
-    | summarize AggregatedValue = avg(CounterValue) by Computer
-  QUERY
-
-  trigger {
-    operator  = "GreaterThan"
-    threshold = 85
+  action {
+    action_groups = [azurerm_monitor_action_group.alert_notifications.id]
   }
 }
 
 
-resource "azurerm_monitor_scheduled_query_rules_alert" "alert_ssh_failures" {
+
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "alert_ssh_failures" {
   name                = "alert-${var.environment}-ssh-brute-force"
   location            = var.location
   resource_group_name = var.resource_group_name
+  scopes              = [azurerm_log_analytics_workspace.law.id]
 
-  action {
-    action_group = [azurerm_monitor_action_group.alert_notifications.id]
+  description          = "Triggers if more than 5 failed SSH login attempts happen within 5 minutes."
+  
+ 
+  severity             = 1 
+  
+  enabled              = true
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT5M"
+
+  criteria {
+    query = <<-QUERY
+      Syslog
+      | where Facility in ("auth", "authpriv")
+      | where SyslogMessage has "failed" or SyslogMessage has "Invalid user"
+    QUERY
+
+    time_aggregation_method = "Count"
+    operator                = "GreaterThan"
+    threshold               = 5
+
+    failing_periods {
+      minimum_failing_periods_to_trigger_alert = 1
+      number_of_evaluation_periods       = 1
+    }
   }
 
-  data_source_id = azurerm_log_analytics_workspace.law.id
-  description    = "Triggers if more than 5 failed SSH login attempts happen within 5 minutes."
-  enabled        = true
-  frequency      = 5
-  time_window    = 5
-
-
-  query       = <<-QUERY
-    Syslog
-    | where Facility in ("auth", "authpriv")
-    | where SyslogMessage has "failed" or SyslogMessage has "Invalid user"
-    | summarize FailedCount = count() by Computer
-  QUERY
-
-  trigger {
-    operator  = "GreaterThan"
-    threshold = 5
+  action {
+    action_groups = [azurerm_monitor_action_group.alert_notifications.id]
   }
 }
