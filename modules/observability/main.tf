@@ -34,10 +34,10 @@ resource "azurerm_monitor_data_collection_rule" "dcr" {
     performance_counter {
       streams                       = ["Microsoft-Perf"]
       sampling_frequency_in_seconds = 60
-      counter_specifiers            = [
-        "\\Processor(_Total)\\% Processor Time",
-        "\\Memory\\Available MBytes",
-        "\\LogicalDisk(_Total)\\% Free Space"
+      counter_specifiers = [
+        "Processor(*)\\% Processor Time",
+        "Memory(*)\\% Used Memory",
+        "Logical Disk(*)\\% Free Space"
       ]
       name                          = "vm-perf-counters"
     }
