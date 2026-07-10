@@ -77,24 +77,20 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "alert_heartbeat" {
   scopes              = [azurerm_log_analytics_workspace.law.id]
 
   description          = "Triggers when the Linux VM stops reporting health heartbeats for over 5 minutes."
-  severity             = 1 # 1 = Error (A completely silent VM is usually a critical infrastructure issue)
+  severity             = 1
   enabled              = true
-  
-  # Frequency and Window mapped to ISO 8601 strings
   evaluation_frequency = "PT5M"
   window_duration      = "PT5M"
 
   criteria {
-   
-    
     query = <<-QUERY
       Heartbeat
     QUERY
 
-    
     time_aggregation_method = "Count"
-    resource_id_column      = "Computer"
     
+
+    resource_id_column      = "_ResourceId" 
     
     operator                = "LessThan"
     threshold               = 1
@@ -129,12 +125,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "alert_cpu_spike" {
     query = <<-QUERY
       Perf
       | where ObjectName == "Processor" and CounterName == "% Processor Time"
-      | summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 5m), Computer
+      | summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 5m), _ResourceId
     QUERY
 
     time_aggregation_method = "Average"
     metric_measure_column   = "AggregatedValue"
-    resource_id_column      = "Computer"
+    resource_id_column      = "_ResourceId"
     operator                = "GreaterThan"
     threshold               = 85
 
