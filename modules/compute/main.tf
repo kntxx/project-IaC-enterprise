@@ -38,7 +38,9 @@ resource "azurerm_linux_virtual_machine" "this" {
     custom_data = base64encode(templatefile("${path.root}/modules/scripts/webserver.sh", {
     environment = var.environment
   }))
-
+    identity {
+        type = "SystemAssigned"
+      }
     os_disk {
       caching = "ReadWrite"
       storage_account_type = "Standard_LRS"
